@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# all OS guesses are just assumptions
+
+warn() {
+  echo "WARNING: rc file must not be executed directly, use 'source'"
+  exit 0
+}
+
+if uname -a|grep -qi darwin &>/dev/null
+then
+  export OS_DETECTED=macos
+  # macOS package system
+  if type port &>/dev/null
+  then
+    export MACOS_PACKAGER=port
+  else
+    # fink is dead, assume homebrew
+    export MACOS_PACKAGER=brew
+  fi
+  return &>/dev/null || warn
+fi
+if type zypper &>/dev/null
+then
+  export OS_DETECTED=suse
+  return &>/dev/null || warn
+fi
+if type dpkg &>/dev/null
+then
+  export OS_DETECTED=debian
+  return &>/dev/null || warn
+fi
+if type dnf &>/dev/null
+then
+  export OS_DETECTED=fedora
+  return &>/dev/null || warn
+fi
+if type yum &>/dev/null
+then
+  export OS_DETECTED=centos
+  return &>/dev/null || warn
+fi
+export OS_DETECTED=bsd
+return &>/dev/null || warn
+
+# use modeline modelines=1 in vimrc
+# vim: set sts=2 sw=2 ts=2 ai et:
